@@ -1,8 +1,11 @@
 package pl.urban.android.lib.contactmodule;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
+import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 
@@ -35,10 +38,9 @@ public class ContactProvider {
             }
 
             final List<Contact> result = new ArrayList<>(contactsCursor.getCount());
-            contactsCursor.moveToFirst();
-            do {
+            while (contactsCursor.moveToNext()) {
                 result.add(mapContactFromCursor(contactsCursor));
-            } while (contactsCursor.moveToNext());
+            }
 
             return result;
         }
@@ -51,8 +53,7 @@ public class ContactProvider {
                 return;
             }
 
-            lookupCursor.moveToFirst();
-            do {
+            while (lookupCursor.moveToNext()) {
                 if (lookupCursor.getString(lookupCursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME)).equalsIgnoreCase(contact.getName())) {
                     final String lookupKey = lookupCursor.getString(lookupCursor.getColumnIndex(ContactsContract.PhoneLookup.LOOKUP_KEY));
                     final Uri removeUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
@@ -60,7 +61,7 @@ public class ContactProvider {
 
                     return;
                 }
-            } while (lookupCursor.moveToNext());
+            }
         }
     }
 
@@ -82,8 +83,36 @@ public class ContactProvider {
         return false;
     }
 
-    public void addContact(@NonNull final Contact contact) {
+    public void addContact(@NonNull final Contact contact) throws RemoteException, OperationApplicationException {
+        if (!doesContactExists(contact)) {
+            ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+            int rawContactInsertIndex = ops.size();
 
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null).build());
+
+            // Phone Number
+            ops.add(ContentProviderOperation
+                    .newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID,
+                            rawContactInsertIndex)
+                    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, contact.getNumber())
+                    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, "1").build());
+
+            // Display name/Contact name
+            ops.add(ContentProviderOperation
+                    .newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID,
+                            rawContactInsertIndex)
+                    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, contact.getName())
+                    .build());
+
+            mContentResolver.applyBatch(ContactsContract.AUTHORITY, ops);
+        }
     }
 
     private Cursor quickQuery(@NonNull final Uri contentUri) {
