@@ -2,6 +2,7 @@ package pl.urban.android.lib.contactmodule;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 
@@ -38,13 +39,29 @@ public class ContactProvider {
             do {
                 result.add(mapContactFromCursor(contactsCursor));
             } while (contactsCursor.moveToNext());
-            
+
             return result;
         }
     }
 
     public void deleteContact(@NonNull final Contact contact) {
+        final Uri contactLookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(contact.getNumber()));
+        try (final Cursor lookupCursor = quickQuery(contactLookupUri)) {
+            if (lookupCursor == null || lookupCursor.getCount() == 0) {
+                return;
+            }
 
+            lookupCursor.moveToFirst();
+            do {
+                if (lookupCursor.getString(lookupCursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME)).equalsIgnoreCase(contact.getName())) {
+                    final String lookupKey = lookupCursor.getString(lookupCursor.getColumnIndex(ContactsContract.PhoneLookup.LOOKUP_KEY));
+                    final Uri removeUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
+                    mContentResolver.delete(removeUri, null, null);
+
+                    return;
+                }
+            } while (lookupCursor.moveToNext());
+        }
     }
 
     public boolean doesContactExists(@NonNull final Contact contact) {
@@ -53,6 +70,10 @@ public class ContactProvider {
 
     public void addContact(@NonNull final Contact contact) {
 
+    }
+
+    private Cursor quickQuery(@NonNull final Uri contentUri) {
+        return mContentResolver.query(contentUri, null, null, null, null);
     }
 
     private Contact mapContactFromCursor(@NonNull final Cursor cursor) {
