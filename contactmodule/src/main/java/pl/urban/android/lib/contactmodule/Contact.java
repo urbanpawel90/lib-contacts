@@ -1,10 +1,12 @@
 package pl.urban.android.lib.contactmodule;
 
+import android.support.annotation.NonNull;
+
 public class Contact {
     private final String mName;
     private final String mNumber;
 
-    public Contact(final String name, final String number) {
+    public Contact(@NonNull final String name, @NonNull final String number) {
         mName = name;
         mNumber = number;
     }

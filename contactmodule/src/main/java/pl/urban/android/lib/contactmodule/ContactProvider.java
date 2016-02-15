@@ -65,6 +65,20 @@ public class ContactProvider {
     }
 
     public boolean doesContactExists(@NonNull final Contact contact) {
+        final Uri lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(contact.getNumber()));
+        try (final Cursor lookupCursor = mContentResolver.query(lookupUri, new String[]{ContactsContract.PhoneLookup._ID, ContactsContract.PhoneLookup.LABEL},
+                null, null, null)) {
+            if (lookupCursor == null || lookupCursor.getCount() == 0) {
+                return false;
+            }
+
+            while (lookupCursor.moveToNext()) {
+                final String contactName = lookupCursor.getString(lookupCursor.getColumnIndex(ContactsContract.PhoneLookup.LABEL));
+                if (contact.getName().equalsIgnoreCase(contactName)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
