@@ -3,6 +3,8 @@ package pl.urban.android.lib.contactmodule;
 import org.junit.Before;
 import org.junit.Test;
 
+import android.test.mock.MockContentResolver;
+
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
@@ -14,7 +16,7 @@ public class ContactsTest {
 
     @Before
     public void setUp() throws Exception {
-        mContactProvider = new ContactProvider();
+        mContactProvider = new ContactProvider(new MockContentResolver());
     }
 
     @Test
