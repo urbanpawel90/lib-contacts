@@ -18,4 +18,23 @@ public class Contact {
     public String getNumber() {
         return mNumber;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Contact)) return false;
+
+        Contact contact = (Contact) o;
+
+        if (!mName.equals(contact.mName)) return false;
+        return mNumber.equals(contact.mNumber);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = mName.hashCode();
+        result = 31 * result + mNumber.hashCode();
+        return result;
+    }
 }
