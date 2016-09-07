@@ -66,6 +66,13 @@ public class ContactProvider {
         }
     }
 
+    public boolean doesContactExists(int contactId) {
+        final Uri contactUri = Uri.withAppendedPath(ContactsContract.RawContacts.CONTENT_URI, String.valueOf(contactId));
+        try (final Cursor contactCursor = mContentResolver.query(contactUri, new String[]{ContactsContract.RawContacts._ID}, null, null, null)) {
+            return !(contactCursor == null || contactCursor.getCount() == 0);
+        }
+    }
+
     public boolean doesContactExists(@NonNull final Contact contact) {
         final Uri lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(contact.getNumber()));
         try (final Cursor lookupCursor = mContentResolver.query(lookupUri, new String[]{ContactsContract.PhoneLookup._ID, ContactsContract.PhoneLookup.LABEL},
