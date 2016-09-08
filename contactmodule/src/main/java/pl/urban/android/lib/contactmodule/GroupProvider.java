@@ -8,7 +8,12 @@ import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 
 public class GroupProvider {
-    private static final String[] PROJECTION = {ContactsContract.Groups.TITLE};
+    private static final String[] GROUP_PROJECTION = {ContactsContract.Groups.TITLE};
+    private static final String[] MEMBERSHIP_PROJECTION = {
+            ContactsContract.CommonDataKinds.GroupMembership.RAW_CONTACT_ID};
+
+    private static final String MEMBERSHIP_SELECTION =
+            ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID + " = ?";
     private static final String SELECTION_BY_ID = ContactsContract.Groups._ID + "=?";
 
     private final ContentResolver mContentResolver;
@@ -33,7 +38,7 @@ public class GroupProvider {
 
     public boolean isExistingGroup(String groupId) {
         try (Cursor groupCursor = mContentResolver.query(ContactsContract.Groups.CONTENT_URI,
-                PROJECTION, SELECTION_BY_ID,
+                GROUP_PROJECTION, SELECTION_BY_ID,
                 new String[]{groupId}, null)) {
             return groupCursor != null && groupCursor.getCount() > 0;
         }
@@ -43,6 +48,25 @@ public class GroupProvider {
         return mContentResolver.delete(
                 Uri.withAppendedPath(ContactsContract.Groups.CONTENT_URI, groupId),
                 null, null) > 0;
+    }
+
+    public void deleteGroupWithContacts(String groupId) {
+        deleteGroup(groupId);
+        try (final Cursor membershipCursor = mContentResolver.query(
+                ContactsContract.Data.CONTENT_URI, MEMBERSHIP_PROJECTION,
+                MEMBERSHIP_SELECTION, new String[]{groupId}, null)) {
+            if (membershipCursor == null || membershipCursor.getCount() == 0) {
+                return;
+            }
+            while (membershipCursor.moveToNext()) {
+                int contactId = membershipCursor.getInt(
+                        membershipCursor.getColumnIndex(ContactsContract.CommonDataKinds.
+                                GroupMembership.RAW_CONTACT_ID));
+                mContentResolver.delete(Uri.withAppendedPath(
+                        ContactsContract.RawContacts.CONTENT_URI,
+                        String.valueOf(contactId)), null, null);
+            }
+        }
     }
 
     public boolean assignContactToGroup(String contactId, String groupId) {
