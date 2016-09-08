@@ -48,16 +48,20 @@ public class ContactProvider {
     }
 
     public void deleteContact(@NonNull final Contact contact) {
-        final Uri contactLookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(contact.getNumber()));
+        final Uri contactLookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(contact.getNumber()));
         try (final Cursor lookupCursor = quickQuery(contactLookupUri)) {
             if (lookupCursor == null || lookupCursor.getCount() == 0) {
                 return;
             }
 
             while (lookupCursor.moveToNext()) {
-                if (lookupCursor.getString(lookupCursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME)).equalsIgnoreCase(contact.getName())) {
-                    final String lookupKey = lookupCursor.getString(lookupCursor.getColumnIndex(ContactsContract.PhoneLookup.LOOKUP_KEY));
-                    final Uri removeUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
+                if (lookupCursor.getString(lookupCursor.getColumnIndex(
+                        ContactsContract.PhoneLookup.DISPLAY_NAME)).equalsIgnoreCase(contact.getName())) {
+                    final String lookupKey = lookupCursor.getString(
+                            lookupCursor.getColumnIndex(ContactsContract.PhoneLookup.LOOKUP_KEY));
+                    final Uri removeUri = Uri.withAppendedPath(
+                            ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
                     mContentResolver.delete(removeUri, null, null);
 
                     return;
@@ -67,22 +71,27 @@ public class ContactProvider {
     }
 
     public boolean doesContactExists(int contactId) {
-        final Uri contactUri = Uri.withAppendedPath(ContactsContract.RawContacts.CONTENT_URI, String.valueOf(contactId));
-        try (final Cursor contactCursor = mContentResolver.query(contactUri, new String[]{ContactsContract.RawContacts._ID}, null, null, null)) {
+        final Uri contactUri = Uri.withAppendedPath(
+                ContactsContract.RawContacts.CONTENT_URI, String.valueOf(contactId));
+        try (final Cursor contactCursor = mContentResolver.query(contactUri,
+                new String[]{ContactsContract.RawContacts._ID}, null, null, null)) {
             return !(contactCursor == null || contactCursor.getCount() == 0);
         }
     }
 
     public boolean doesContactExists(@NonNull final Contact contact) {
-        final Uri lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(contact.getNumber()));
-        try (final Cursor lookupCursor = mContentResolver.query(lookupUri, new String[]{ContactsContract.PhoneLookup._ID, ContactsContract.PhoneLookup.LABEL},
+        final Uri lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(contact.getNumber()));
+        try (final Cursor lookupCursor = mContentResolver.query(lookupUri,
+                new String[]{ContactsContract.PhoneLookup._ID, ContactsContract.PhoneLookup.LABEL},
                 null, null, null)) {
             if (lookupCursor == null || lookupCursor.getCount() == 0) {
                 return false;
             }
 
             while (lookupCursor.moveToNext()) {
-                final String contactName = lookupCursor.getString(lookupCursor.getColumnIndex(ContactsContract.PhoneLookup.LABEL));
+                final String contactName = lookupCursor.getString(
+                        lookupCursor.getColumnIndex(ContactsContract.PhoneLookup.LABEL));
                 if (contact.getName().equalsIgnoreCase(contactName)) {
                     return true;
                 }
