@@ -51,7 +51,6 @@ public class GroupProvider {
     }
 
     public void deleteGroupWithContacts(String groupId) {
-        deleteGroup(groupId);
         try (final Cursor membershipCursor = mContentResolver.query(
                 ContactsContract.Data.CONTENT_URI, MEMBERSHIP_PROJECTION,
                 MEMBERSHIP_SELECTION, new String[]{groupId}, null)) {
@@ -67,6 +66,7 @@ public class GroupProvider {
                         new String[]{String.valueOf(contactId)});
             }
         }
+        deleteGroup(groupId);
     }
 
     public boolean assignContactToGroup(String contactId, String groupId) {
