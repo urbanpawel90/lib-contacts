@@ -59,8 +59,7 @@ public class GroupProvider {
             }
             while (membershipCursor.moveToNext()) {
                 int contactId = membershipCursor.getInt(
-                        membershipCursor.getColumnIndex(ContactsContract.CommonDataKinds.
-                                GroupMembership.RAW_CONTACT_ID));
+                        membershipCursor.getColumnIndex(ContactsContract.Data.CONTACT_ID));
                 mContentResolver.delete(ContactsContract.RawContacts.CONTENT_URI,
                         ContactsContract.RawContacts.CONTACT_ID + "=?",
                         new String[]{String.valueOf(contactId)});
