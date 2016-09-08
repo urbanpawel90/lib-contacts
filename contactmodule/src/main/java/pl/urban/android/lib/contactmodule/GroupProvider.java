@@ -10,7 +10,7 @@ import android.support.annotation.NonNull;
 public class GroupProvider {
     private static final String[] GROUP_PROJECTION = {ContactsContract.Groups.TITLE};
     private static final String[] MEMBERSHIP_PROJECTION = {
-            ContactsContract.CommonDataKinds.GroupMembership.RAW_CONTACT_ID};
+            ContactsContract.Data.CONTACT_ID};
 
     private static final String MEMBERSHIP_SELECTION =
             ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID + " = ?";
@@ -62,8 +62,8 @@ public class GroupProvider {
                 int contactId = membershipCursor.getInt(
                         membershipCursor.getColumnIndex(ContactsContract.CommonDataKinds.
                                 GroupMembership.RAW_CONTACT_ID));
-                mContentResolver.delete(ContactsContract.Data.CONTENT_URI,
-                        ContactsContract.CommonDataKinds.GroupMembership.RAW_CONTACT_ID + "=?",
+                mContentResolver.delete(ContactsContract.RawContacts.CONTENT_URI,
+                        ContactsContract.RawContacts.CONTACT_ID + "=?",
                         new String[]{String.valueOf(contactId)});
             }
         }
