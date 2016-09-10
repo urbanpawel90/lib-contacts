@@ -15,7 +15,7 @@ import java.util.List;
 public class FdnProvider {
     private static final Uri FDN_URI = Uri.parse("content://icc/fdn");
     private static final String[] PROJECTION = new String[]{
-            Columns.NAME, Columns.NUMBER
+            Columns.ID, Columns.NAME, Columns.NUMBER
     };
 
     private static final String DELETE_WHERE = Columns.NAME + " = ? AND " +
@@ -34,7 +34,7 @@ public class FdnProvider {
         }
 
         final ContentValues insertValues = new ContentValues();
-        insertValues.put(Columns.NAME, entry.getName());
+        insertValues.put(Columns.TAG, entry.getName());
         insertValues.put(Columns.NUMBER, entry.getNumber());
         insertValues.put(Columns.PIN2, entry.getPin2());
 
@@ -90,8 +90,13 @@ public class FdnProvider {
     }
 
     public static final class Columns {
-        public static final String NAME = "tag";
+        public static final String NAME = "name";
+        public static final String TAG = "tag";
         public static final String NUMBER = "number";
         public static final String PIN2 = "pin2";
+        public static final String ID = "_id";
+
+        private Columns() {
+        }
     }
 }
