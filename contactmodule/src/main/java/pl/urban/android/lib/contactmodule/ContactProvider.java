@@ -16,6 +16,7 @@ import java.util.List;
 
 public class ContactProvider {
     private static final String[] PROJECTION = new String[]{
+            ContactsContract.CommonDataKinds.Phone._ID,
             ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
             ContactsContract.CommonDataKinds.Phone.NUMBER
     };
@@ -140,6 +141,7 @@ public class ContactProvider {
 
     private Contact mapContactFromCursor(@NonNull final Cursor cursor) {
         return new Contact(
+                cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID)),
                 cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)),
                 cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
         );

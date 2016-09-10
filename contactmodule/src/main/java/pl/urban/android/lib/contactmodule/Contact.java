@@ -1,14 +1,21 @@
 package pl.urban.android.lib.contactmodule;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 public class Contact {
+    private final Integer mId;
     private final String mName;
     private final String mNumber;
 
-    public Contact(@NonNull final String name, @NonNull final String number) {
+    public Contact(@Nullable Integer id, @NonNull final String name, @NonNull final String number) {
+        mId = id;
         mName = name;
         mNumber = number;
+    }
+
+    public Integer getId() {
+        return mId;
     }
 
     public String getName() {

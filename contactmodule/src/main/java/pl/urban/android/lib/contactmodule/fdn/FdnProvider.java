@@ -15,7 +15,7 @@ import java.util.List;
 public class FdnProvider {
     private static final Uri FDN_URI = Uri.parse("content://icc/fdn");
     private static final String[] PROJECTION = new String[]{
-            Columns.NAME, Columns.NUMBER
+            Columns.ID, Columns.NAME, Columns.NUMBER
     };
 
     private static final String DELETE_WHERE = Columns.NAME + " = ? AND " +
@@ -28,7 +28,7 @@ public class FdnProvider {
         mContentResolver = contentResolver;
     }
 
-    public boolean insertFdn(@NonNull final FdnEntry entry) throws InvalidParameterException {
+    public Integer insertFdn(@NonNull final FdnEntry entry) throws InvalidParameterException {
         if (entry.getPin2() == null || entry.getPin2().trim().isEmpty()) {
             throw new InvalidParameterException("pin2 == null");
         }
@@ -39,7 +39,7 @@ public class FdnProvider {
         insertValues.put(Columns.PIN2, entry.getPin2());
 
         final Uri rowUri = mContentResolver.insert(FDN_URI, insertValues);
-        return rowUri != null;
+        return rowUri != null ? Integer.parseInt(rowUri.getLastPathSegment()) : null;
     }
 
     public boolean deleteFdn(@NonNull final FdnEntry entry) throws InvalidParameterException {
@@ -84,7 +84,9 @@ public class FdnProvider {
     }
 
     private FdnEntry mapEntryFromCursor(@NonNull final Cursor cursor) {
-        return new FdnEntry(cursor.getString(cursor.getColumnIndex(Columns.NAME)),
+        return new FdnEntry(
+                cursor.getInt(cursor.getColumnIndex(Columns.ID)),
+                cursor.getString(cursor.getColumnIndex(Columns.NAME)),
                 cursor.getString(cursor.getColumnIndex(Columns.NUMBER)));
     }
 
@@ -92,5 +94,6 @@ public class FdnProvider {
         public static final String NAME = "tag";
         public static final String NUMBER = "number";
         public static final String PIN2 = "pin2";
+        public static final String ID = "_id";
     }
 }
