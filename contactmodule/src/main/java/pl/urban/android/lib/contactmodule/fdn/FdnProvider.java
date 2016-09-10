@@ -18,9 +18,9 @@ public class FdnProvider {
             Columns.ID, Columns.NAME, Columns.NUMBER
     };
 
-    private static final String DELETE_WHERE = Columns.TAG + " = ? AND " +
-            Columns.NUMBER + " = ? AND " +
-            Columns.PIN2 + " = ?";
+    private static final String DELETE_WHERE = Columns.NAME + "=? AND " +
+            Columns.NUMBER + "=? AND " +
+            Columns.PIN2 + "=?";
 
     private final ContentResolver mContentResolver;
 
@@ -34,7 +34,7 @@ public class FdnProvider {
         }
 
         final ContentValues insertValues = new ContentValues();
-        insertValues.put(Columns.TAG, entry.getName());
+        insertValues.put(Columns.NAME, entry.getName());
         insertValues.put(Columns.NUMBER, entry.getNumber());
         insertValues.put(Columns.PIN2, entry.getPin2());
 
