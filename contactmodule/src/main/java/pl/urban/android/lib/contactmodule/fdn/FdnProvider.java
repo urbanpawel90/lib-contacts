@@ -15,11 +15,11 @@ import java.util.List;
 public class FdnProvider {
     private static final Uri FDN_URI = Uri.parse("content://icc/fdn");
     private static final String[] PROJECTION = new String[]{
-            Columns.ID, Columns.NAME, Columns.NUMBER
+            Columns.NAME, Columns.NUMBER
     };
 
     private static final String DELETE_WHERE = Columns.NAME + " = ? AND " +
-            Columns.NUMBER + " = ? AND" +
+            Columns.NUMBER + " = ? AND " +
             Columns.PIN2 + " = ?";
 
     private final ContentResolver mContentResolver;
@@ -84,8 +84,7 @@ public class FdnProvider {
     }
 
     private FdnEntry mapEntryFromCursor(@NonNull final Cursor cursor) {
-        return new FdnEntry(
-                cursor.getInt(cursor.getColumnIndex(Columns.ID)),
+        return new FdnEntry(null,
                 cursor.getString(cursor.getColumnIndex(Columns.NAME)),
                 cursor.getString(cursor.getColumnIndex(Columns.NUMBER)));
     }
@@ -94,6 +93,5 @@ public class FdnProvider {
         public static final String NAME = "tag";
         public static final String NUMBER = "number";
         public static final String PIN2 = "pin2";
-        public static final String ID = "_id";
     }
 }
