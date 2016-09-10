@@ -18,7 +18,7 @@ public class FdnProvider {
             Columns.ID, Columns.NAME, Columns.NUMBER
     };
 
-    private static final String DELETE_WHERE = Columns.NAME + " = ? AND " +
+    private static final String DELETE_WHERE = Columns.TAG + " = ? AND " +
             Columns.NUMBER + " = ? AND " +
             Columns.PIN2 + " = ?";
 
@@ -84,7 +84,7 @@ public class FdnProvider {
     }
 
     private FdnEntry mapEntryFromCursor(@NonNull final Cursor cursor) {
-        return new FdnEntry(null,
+        return new FdnEntry(cursor.getInt(cursor.getColumnIndex(Columns.ID)),
                 cursor.getString(cursor.getColumnIndex(Columns.NAME)),
                 cursor.getString(cursor.getColumnIndex(Columns.NUMBER)));
     }
