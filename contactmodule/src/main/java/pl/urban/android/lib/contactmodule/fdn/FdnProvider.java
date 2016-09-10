@@ -18,9 +18,9 @@ public class FdnProvider {
             Columns.ID, Columns.NAME, Columns.NUMBER
     };
 
-    private static final String DELETE_WHERE = Columns.NAME + "=? AND " +
-            Columns.NUMBER + "=? AND " +
-            Columns.PIN2 + "=?";
+    private static final String DELETE_WHERE = Columns.TAG + "='%s' AND " +
+            Columns.NUMBER + "='%s' AND " +
+            Columns.PIN2 + "='%s'";
 
     private final ContentResolver mContentResolver;
 
@@ -34,7 +34,7 @@ public class FdnProvider {
         }
 
         final ContentValues insertValues = new ContentValues();
-        insertValues.put(Columns.NAME, entry.getName());
+        insertValues.put(Columns.TAG, entry.getName());
         insertValues.put(Columns.NUMBER, entry.getNumber());
         insertValues.put(Columns.PIN2, entry.getPin2());
 
@@ -60,11 +60,10 @@ public class FdnProvider {
 
         if (!found) return false;
 
-        final int deletedRows = mContentResolver.delete(FDN_URI, DELETE_WHERE, new String[]{
+        final int deletedRows = mContentResolver.delete(FDN_URI, String.format(DELETE_WHERE,
                 entry.getName(),
                 entry.getNumber(),
-                entry.getPin2()
-        });
+                entry.getPin2()), null);
 
         return deletedRows > 0;
     }
